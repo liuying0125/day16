@@ -1,5 +1,5 @@
 #include <func.h>
-
+void recvCycle(int,void*,int);
 int main(int argc,char* argv[])
 {
     ARGS_CHECK(argc,3);
@@ -27,6 +27,7 @@ int main(int argc,char* argv[])
     fd =open(buf,O_CREAT|O_RDWR,0666);
     ERROR_CHECK(fd,-1,"open");
 
+    //recieve  file size
     off_t fileSize,downLoadsize = 0;
  
     recvCycle(socketFd,&dataLen,4); //begin receive
@@ -37,21 +38,22 @@ int main(int argc,char* argv[])
 
     while(1)
     {
-        recv(socketFd,&dataLen,4,0);
+        recvCycle(socketFd,&dataLen,4);
         if(dataLen>0)
         {
-            recv(socketFd,buf,dataLen,0);
+            recvCycle(socketFd,buf,dataLen);
             write(fd,buf,dataLen);
             downLoadsize+=dataLen;
             time(&nowTime);
             if(nowTime - lastTime >=1)
             {
+
                 printf("%5.2f%s\r",(float)downLoadsize/fileSize*100,"%");
                 fflush(stdout);
                 lastTime = nowTime;
             }
         }else{
-            printf("100.00\n");
+            printf("100.00% \n");
             break;
         }
     }

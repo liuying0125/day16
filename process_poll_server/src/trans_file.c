@@ -12,16 +12,17 @@ int transFile(int newFd)
     train.dataLen = strlen(FILENAME); //file name must be string type 
     strcpy(train.buf,FILENAME);
     send(newFd,&train,4+train.dataLen,0);
+    
     //send file size to client
     struct stat buf;
     int fd = open(FILENAME,O_RDWR);
-    fstat(fd,&buf);
+    fstat(fd,&buf);//gets file size
     train.dataLen = sizeof(buf.st_size);
     
-    send(newFd,&train,4+train.dataLen,0);
-
     memcpy(train.buf,   &buf.st_size,  train.dataLen);
-    
+    // send file
+    send(newFd,&train,4+train.dataLen,0);
+   
     while((train.dataLen = read(fd,train.buf,sizeof(train.buf))))
     {
         ret = send(newFd,&train,4+train.dataLen,0);
