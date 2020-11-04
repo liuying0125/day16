@@ -1,0 +1,27 @@
+#include <func.h>
+
+int main(int argc,char* argv[])
+{
+    int sock;
+    struct sockaddr_in serv_addr;
+    char message[30];
+    int ret;
+    int str_len;
+    
+    ARGS_CHECK(argc,3);
+    sock = socket(PF_INET,SOCK_STREAM,0);
+    memset(&serv_addr,0,sizeof(serv_addr));
+    serv_addr.sin_family  =AF_INET;
+    serv_addr.sin_addr.s_addr = inet_addr(argv[1]);
+    serv_addr.sin_port = htons(atoi(argv[2]));
+
+    ret = connect(sock,(struct sockaddr*)&serv_addr,sizeof(serv_addr));
+
+    str_len = read(sock,message,sizeof(message)-1);
+    ERROR_CHECK(str_len,-1,"read");
+
+    printf("Message from server : %s\n",message);
+    close(sock);
+    return 0;
+}
+
