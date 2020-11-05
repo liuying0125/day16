@@ -43,7 +43,7 @@ int main(int argc,char* argv[])
                     {
                         sendFd(pData[j].pipeFd,newFd); //把任务发给对应的子进程
                         pData[j].busy=1;
-                        printf("%d pid is busy",pData[j].pid);
+                        printf("%d pid is busy\n",pData[j].pid);
                         break;
                     }
                 }

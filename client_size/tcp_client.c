@@ -1,5 +1,5 @@
 #include <func.h>
-
+void recvCycle(int,void*,int);
 int main(int argc,char* argv[])
 {
     ARGS_CHECK(argc,3);
@@ -27,33 +27,36 @@ int main(int argc,char* argv[])
     fd =open(buf,O_CREAT|O_RDWR,0666);
     ERROR_CHECK(fd,-1,"open");
 
-    off_t fileSize,downLoadsize = 0;
+    //recieve  file size
+    off_t fileSize,downLoadsize = 0,lastLoadSize=0,slice;
+ 
     recvCycle(socketFd,&dataLen,4); //begin receive
     recvCycle(socketFd,&fileSize,dataLen);
-    
-    time_t lastTime,nowTime;
-    lastTime = nowTime = time(NULL);
-
+    slice = fileSize/50;
+    struct timeval start,end;
+    gettimeofday(&start,NULL);
     while(1)
     {
-        recv(socketFd,&dataLen,4,0);
+        recvCycle(socketFd,&dataLen,4);
         if(dataLen>0)
         {
-            recv(socketFd,buf,dataLen,0);
+            recvCycle(socketFd,buf,dataLen);
             write(fd,buf,dataLen);
             downLoadsize+=dataLen;
-            time(&nowTime);
-            if(nowTime - lastTime >=1)
+            if(downLoadsize - lastLoadSize >= slice)
             {
+
                 printf("%5.2f%s\r",(float)downLoadsize/fileSize*100,"%");
                 fflush(stdout);
-                lastTime = nowTime;
+                lastLoadSize = downLoadsize;
             }
         }else{
-            printf("100.00\n");
+            printf("100.00%%\n");
             break;
         }
     }
+    gettimeofday(&end,NULL);
+    printf("use time = %ld\n",(end.tv_sec - start.tv_sec)*1000000+end.tv_usec -start.tv_usec);
     close(fd);
     close(socketFd);
 }

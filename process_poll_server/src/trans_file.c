@@ -17,7 +17,8 @@ int transFile(int newFd)
     struct stat buf;
     int fd = open(FILENAME,O_RDWR);
     fstat(fd,&buf);//gets file size
-    train.dataLen = sizeof(buf.st_size);
+
+    train.dataLen = sizeof(buf.st_size); // 8 
     
     memcpy(train.buf,   &buf.st_size,  train.dataLen);
     // send file

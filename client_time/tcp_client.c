@@ -31,11 +31,11 @@ int main(int argc,char* argv[])
     off_t fileSize,downLoadsize = 0;
  
     recvCycle(socketFd,&dataLen,4); //begin receive
-    recvCycle(socketFd,&fileSize,dataLen);
-    
+    recvCycle(socketFd,&fileSize,dataLen); //know file size
     time_t lastTime,nowTime;
     lastTime = nowTime = time(NULL);
-
+    struct timeval start,end;
+    gettimeofday(&start,NULL);
     while(1)
     {
         recvCycle(socketFd,&dataLen,4);
@@ -45,7 +45,7 @@ int main(int argc,char* argv[])
             write(fd,buf,dataLen);
             downLoadsize+=dataLen;
             time(&nowTime);
-            if(nowTime - lastTime >=1)
+            if(nowTime - lastTime > 0.1 )
             {
 
                 printf("%5.2f%s\r",(float)downLoadsize/fileSize*100,"%");
@@ -53,10 +53,13 @@ int main(int argc,char* argv[])
                 lastTime = nowTime;
             }
         }else{
-            printf("100.00% \n");
+            printf("100.00%%\n");
             break;
         }
     }
+    gettimeofday(&end,NULL);
+    printf("use time = %ld\n",(end.tv_sec - start.tv_sec)*1000000+end.tv_usec -start.tv_usec);
+
     close(fd);
     close(socketFd);
 }

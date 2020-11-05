@@ -8,7 +8,6 @@ void recvCycle(int sfd,void* buf,int recvLen)
     {
         ret = recv(sfd,p+total,recvLen-total,0);
         total += ret;
-
     }
 
 }
